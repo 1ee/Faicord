@@ -7,7 +7,7 @@
 import "./styles.css";
 
 import { addMessagePreSendListener, removeMessagePreSendListener } from "@api/MessageEvents";
-import { EyeIcon } from "@components/Icons";
+import { FileIcon } from "@components/Icons";
 import SettingsPlugin from "@plugins/_core/settings";
 import { Devs } from "@utils/constants";
 import { removeFromArray } from "@utils/misc";
@@ -30,7 +30,7 @@ export default definePlugin({
             key: "equicord_i_remember_you",
             title: "I Remember You",
             Component: () => <DataUI usersCollection={data.usersCollection} />,
-            Icon: EyeIcon
+            Icon: FileIcon
         });
 
         const data = (this.dataManager = await new Data().withStart());
