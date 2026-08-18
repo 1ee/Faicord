@@ -153,7 +153,7 @@ function removeGlobalScrollbarHygiene() {
 export default definePlugin({
     name: "ArabicUI",
     description: "Arabic for Discord and Vencord UI. Turn on, restart once. Missing bits stay English.",
-    authors: [Devs.mar, Devs.nyiq],
+    authors: [Devs.xx],
     tags: ["Appearance"],
     restartNeeded: true,
     settings,
