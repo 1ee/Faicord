@@ -151,7 +151,6 @@ function MakeContextCallback(name: "Guild" | "Role" | "User" | "Channel" | "Mess
                 label="View Raw"
                 action={action}
                 icon={CopyRawIcon}
-                leadingAccessory={{ type: "icon", icon: CopyRawIcon }}
             />
         );
     };
@@ -170,7 +169,6 @@ const devContextCallback: NavContextMenuPatchCallback = (children, { id }: { id:
             label="View Raw"
             action={() => openViewRawModal(JSON.stringify(role, null, 4), "Role")}
             icon={CopyRawIcon}
-            leadingAccessory={{ type: "icon", icon: CopyRawIcon }}
         />
     );
 };

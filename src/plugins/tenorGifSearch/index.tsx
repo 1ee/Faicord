@@ -7,13 +7,10 @@
 import { Devs } from "@utils/constants";
 import { isNonNullish } from "@utils/guards";
 import definePlugin from "@utils/types";
-import { findStoreLazy } from "@webpack";
 import { FluxDispatcher, LocaleStore } from "@webpack/common";
 
 // API key is taken from the GBoard app on iOS
 const TENOR_KEY = "3Z0688EVWYKH";
-
-const GIFPickerViewStore = findStoreLazy("GIFPickerViewStore");
 
 let cachedCategories: TrendingCategories | null = null;
 
@@ -24,8 +21,6 @@ interface TenorMedia {
 }
 interface TenorResult {
     id: string;
-    title: string;
-    h1_title: string;
     media: Array<Record<string, TenorMedia>>;
     itemurl: string;
 }
@@ -51,23 +46,17 @@ interface TrendingCategories {
 }
 
 function toDiscordGif(item: TenorResult): DiscordGif | null {
-    // Discord uses tinywebp on Linux, webm on rest (including web Linux). Tenor only has "webp", not "tinywebp"
-    const format = GIFPickerViewStore.getSelectedFormat() === "tinywebp"
-        ? "webp"
-        : "tinywebm";
-
-    const { title, h1_title, id, itemurl } = item;
-    const { gif, [format]: mediaItem } = item.media[0];
+    const { gif, webm } = item.media[0];
 
     return {
-        id: id,
-        title: title || h1_title,
-        url: itemurl,
+        id: item.id,
+        title: "", // discord always returns a blank string
+        url: item.itemurl,
         gif_src: gif.url,
-        src: mediaItem.url,
-        width: mediaItem.dims[0],
-        height: mediaItem.dims[1],
-        preview: mediaItem.preview
+        src: webm.url,
+        width: webm.dims[0],
+        height: webm.dims[1],
+        preview: webm.preview
     };
 }
 
@@ -178,8 +167,8 @@ export default definePlugin({
         {
             find: '"IntegrationQueryStore"',
             replacement: {
-                match: /(?<=search\((\i),(\i)\)\{)let \i=\i\.getResults\(\1,\2\)[,;]/,
-                replace: "return $self.tenorIntegrationSearch($1,$2);$&"
+                match: /(?<=search\((\i),(\i)\)\{)null==\i\.getResults\(\1,\2\)&&/,
+                replace: "return $self.tenorIntegrationSearch($1,$2);null==void 0&&"
             }
         },
         // Add back tenor command
