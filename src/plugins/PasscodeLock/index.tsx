@@ -439,7 +439,7 @@ function onWindowFocus(): void {
 export default definePlugin({
     name: "PasscodeLock",
     description: "Protect Discord from casual access with a local passcode lock screen.",
-    authors: [Devs.Yazan],
+    authors: [Devs.xx],
     settings,
 
     start() {
