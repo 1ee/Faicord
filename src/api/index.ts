@@ -35,7 +35,7 @@ import * as $Settings from "./Settings";
 import * as $Styles from "./Styles";
 import * as $Themes from "./Themes";
 import * as $UserSettings from "./UserSettings";
-
+import * as $NicknameIcons from "./NicknameIcons";
 /**
  * An API allowing you to listen to Message Clicks or run your own logic
  * before a message is sent
@@ -86,6 +86,10 @@ export const ServerList = $ServerList;
 /**
  * An API allowing you to add components as message accessories
  */
+
+export const NicknameIcons = $NicknameIcons;
+
+
 export const MessageDecorations = $MessageDecorations;
 /**
  * An API allowing you to add components to member list users, in both DM's and servers
