@@ -17,7 +17,7 @@ const ModalAPI: t.ModalAPI = mapMangledModuleLazy(".modalKey?", {
     openModalLazy: filters.byCode(".modalKey?"),
     openModal: filters.byCode(",instant:"),
     closeModal: filters.byCode(".onCloseCallback()"),
-    closeAllModals: filters.byCode(".getState();for", " in ")
+    closeAllModals: filters.byCode(".getState();for")
 });
 
 export const { openModalLazy, openModal, closeModal, closeAllModals } = ModalAPI;
