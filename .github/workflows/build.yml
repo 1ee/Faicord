@@ -1,6 +1,10 @@
 name: Build DevBuild
 on:
-    workflow_dispatch:
+    workflow_run:
+        workflows: ["Upstream Sync"]
+        branches: [main]
+        types:
+            - completed
     push:
         branches:
             - main
@@ -11,10 +15,7 @@ on:
             - scripts/build/**
             - package.json
             - pnpm-lock.yaml
-
-permissions:
-    contents: write
-
+    workflow_dispatch:
 env:
     FORCE_COLOR: true
 
@@ -36,9 +37,6 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: Build web
-              run: pnpm buildWebStandalone
-
             - name: Build
               run: pnpm build --standalone
 
@@ -57,9 +55,8 @@ jobs:
             - name: Upload DevBuild as release
               if: github.repository == '1ee/Faicord'
               run: |
-                  gh release view devbuild >/dev/null 2>&1 || gh release create devbuild --title "DevBuild $RELEASE_TAG" --notes "Automated Faicord build" --latest
                   gh release upload devbuild --clobber dist/*
-                  gh release edit devbuild --title "DevBuild $RELEASE_TAG" --latest
+                  gh release edit devbuild --title "DevBuild $RELEASE_TAG"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE_TAG: ${{ env.release_tag }}
