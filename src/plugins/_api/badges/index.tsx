@@ -22,6 +22,7 @@ import { _getBadges, BadgePosition, BadgeUserArgs, ProfileBadge } from "@api/Bad
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { Heart } from "@components/Heart";
+import { CopyIcon, LinkIcon } from "@components/Icons";
 import DonateButton from "@components/settings/DonateButton";
 import { openContributorModal } from "@components/settings/tabs";
 import { Devs } from "@utils/constants";
@@ -34,18 +35,6 @@ import { ContextMenuApi, Forms, Menu, Modal, openModal, Toasts, UserStore } from
 
 const CONTRIBUTOR_BADGE = "https://cdn.discordapp.com/emojis/1092089799109775453.png?size=64";
 
-type SpecialBadgeData = {
-    tooltip: string;
-    badge: string;
-};
-
-type BadgesData = Record<
-    string,
-    Array<Record<"tooltip" | "badge", string>>
-> & {
-    special?: Record<string, SpecialBadgeData>;
-};
-
 const ContributorBadge: ProfileBadge = {
     id: "vencord_contributor_badge",
     description: "Vencord Contributor",
@@ -55,15 +44,14 @@ const ContributorBadge: ProfileBadge = {
     onClick: (_, { userId }) => openContributorModal(UserStore.getUser(userId))
 };
 
-let DonorBadges = {} as BadgesData;
+let DonorBadges = {} as Record<string, Array<Record<"tooltip" | "badge", string>>>;
 
 async function loadBadges(noCache = false) {
     const init = {} as RequestInit;
-
     if (noCache)
         init.cache = "no-cache";
 
-    DonorBadges = await fetch("https://viciouscal.github.io/badges/badges.json", init)
+    DonorBadges = await fetch("https://badges.vencord.dev/badges.json", init)
         .then(r => r.json());
 }
 
@@ -81,6 +69,7 @@ function BadgeContextMenu({ badge }: { badge: Omit<ProfileBadge, "id"> & BadgeUs
                     id="vc-badge-copy-name"
                     label="Copy Badge Name"
                     action={() => copyWithToast(badge.description!)}
+                    leadingAccessory={{ type: "icon", icon: CopyIcon }}
                 />
             )}
             {badge.iconSrc && (
@@ -88,6 +77,7 @@ function BadgeContextMenu({ badge }: { badge: Omit<ProfileBadge, "id"> & BadgeUs
                     id="vc-badge-copy-link"
                     label="Copy Badge Image Link"
                     action={() => copyWithToast(badge.iconSrc!)}
+                    leadingAccessory={{ type: "icon", icon: LinkIcon }}
                 />
             )}
         </Menu.Menu>
@@ -99,7 +89,6 @@ export default definePlugin({
     description: "API to add badges to users",
     authors: [Devs.Megu, Devs.Ven, Devs.TheSun],
     required: true,
-
     patches: [
         {
             find: "#{intl::PROFILE_USER_BADGES}",
@@ -167,20 +156,7 @@ export default definePlugin({
         if (!profile) return [];
 
         try {
-            const badges = _getBadges(profile);
-
-            const specialBadge = DonorBadges.special?.[profile.userId];
-
-            if (specialBadge) {
-                badges.push({
-                    id: `vc_special_badge_${profile.userId}`,
-                    description: specialBadge.tooltip,
-                    iconSrc: specialBadge.badge,
-                    position: BadgePosition.START
-                });
-            }
-
-            return badges;
+            return _getBadges(profile);
         } catch (e) {
             new Logger("BadgeAPI#getBadges").error(e);
             return [];
@@ -191,6 +167,7 @@ export default definePlugin({
         const Component = badge.component!;
         return <Component {...badge} />;
     }, { noop: true }),
+
 
     getBadgeMouseEventHandlers(badge: ProfileBadge & BadgeUserArgs) {
         const handlers = {} as Record<string, (e: React.MouseEvent) => void>;
