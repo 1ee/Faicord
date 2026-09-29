@@ -60,6 +60,11 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     id: 282736831383207937n,
     badge: false
     },
+    atb: {
+    name: "at.b",
+    id: 297283663991668738n,
+    badge: false
+    },
     Yazan:{
         name: "Yazan",
         id: 1098240987983269918n
