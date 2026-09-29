@@ -107,8 +107,8 @@ Optional: `getUntranslatedArabicUiStrings()` in the Discord console lists misses
 
 ## PRs
 
-Target: [1ee/Faicord](https://github.com/1ee/Faicord)
+Target: [viciouscal/Vencord](https://github.com/viciouscal/Vencord)
 
 PRs welcome.
 
-**mar** · [github.com/1ee](https://github.com/1ee)
+**mar** · [github.com/n0tmar](https://github.com/n0tmar)

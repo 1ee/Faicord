@@ -7,10 +7,13 @@
 import { Devs } from "@utils/constants";
 import { isNonNullish } from "@utils/guards";
 import definePlugin from "@utils/types";
-import { FluxDispatcher, GIFPickerViewStore, LocaleStore } from "@webpack/common";
+import { findStoreLazy } from "@webpack";
+import { FluxDispatcher, LocaleStore } from "@webpack/common";
 
 // API key is taken from the GBoard app on iOS
 const TENOR_KEY = "3Z0688EVWYKH";
+
+const GIFPickerViewStore = findStoreLazy("GIFPickerViewStore");
 
 let cachedCategories: TrendingCategories | null = null;
 

@@ -28,7 +28,7 @@ import definePlugin from "@utils/types";
 export default definePlugin({
     name: "BetterScreenshare",
     description: "This plugin allows you to further customize your screenshare.",
-    authors: [Devs.xx],
+    authors: [Devs.viciouscal],
     dependencies: ["PhilsPluginLibrary"],
     patches: [
         {

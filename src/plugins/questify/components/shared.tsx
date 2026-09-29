@@ -4,20 +4,19 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import "../settings.css";
+import "@plugins/questify/settings.css";
 
 import { Card } from "@components/Card";
 import { Heading } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
+import { q } from "@plugins/questify/utils/ui";
 import { findComponentByCodeLazy } from "@webpack";
 import { ColorPicker, Slider } from "@webpack/common";
 import type { ComponentProps, ComponentType, JSX, ReactNode } from "react";
 
-import { q } from "../utils/ui";
-
 export function SettingsCard({ children }: { children: ReactNode; }): JSX.Element {
     return (
-        <Card variant="primary" className={q("setting")}>
+        <Card className={q("setting")}>
             {children}
         </Card>
     );
@@ -182,6 +181,7 @@ export function SettingsSelect({
 }
 
 type ColorPickerWithOnCloseProps = ComponentProps<typeof ColorPicker> & {
+    disabled?: boolean;
     onClose?: () => void;
 };
 
