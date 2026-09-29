@@ -52,9 +52,9 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         id: 343383572805058560n
     },
     xx: {
-        name: "xx",
-        id: 282736831383207937n,
-        badge: false
+    name: "xx",
+    id: 282736831383207937n,
+    badge: false
     },
     Yazan:{
         name: "Yazan",

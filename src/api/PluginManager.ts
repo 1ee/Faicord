@@ -25,6 +25,7 @@ import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccesso
 import { addMessageDecoration, removeMessageDecoration } from "@api/MessageDecorations";
 import { addMessageClickListener, addMessagePreEditListener, addMessagePreSendListener, removeMessageClickListener, removeMessagePreEditListener, removeMessagePreSendListener } from "@api/MessageEvents";
 import { addMessagePopoverButton, removeMessagePopoverButton } from "@api/MessagePopover";
+import { addNicknameIcon, removeNicknameIcon } from "@api/NicknameIcons";
 import { Settings, SettingsStore } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
 import { traceFunction } from "@debug/Tracer";
@@ -204,7 +205,8 @@ export const startPlugin = traceFunction("startPlugin", function startPlugin(p: 
     const {
         name, commands, contextMenus, managedStyle, userProfileBadge,
         onBeforeMessageEdit, onBeforeMessageSend, onMessageClick,
-        chatBarButton, renderMemberListDecorator, renderMessageAccessory, renderMessageDecoration, messagePopoverButton
+        chatBarButton, renderMemberListDecorator, renderMessageAccessory, renderMessageDecoration, messagePopoverButton,
+        renderNicknameIcon
     } = p;
 
     if (p.start) {
@@ -259,6 +261,7 @@ export const startPlugin = traceFunction("startPlugin", function startPlugin(p: 
     if (renderMessageDecoration) addMessageDecoration(name, renderMessageDecoration);
     if (renderMessageAccessory) addMessageAccessory(name, renderMessageAccessory);
     if (messagePopoverButton) addMessagePopoverButton(name, messagePopoverButton.render, messagePopoverButton.icon);
+    if (renderNicknameIcon) addNicknameIcon(name, renderNicknameIcon);
 
     return true;
 }, p => `startPlugin ${p.name}`);
@@ -267,7 +270,8 @@ export const stopPlugin = traceFunction("stopPlugin", function stopPlugin(p: Plu
     const {
         name, commands, contextMenus, managedStyle, userProfileBadge,
         onBeforeMessageEdit, onBeforeMessageSend, onMessageClick,
-        chatBarButton, renderMemberListDecorator, renderMessageAccessory, renderMessageDecoration, messagePopoverButton
+        chatBarButton, renderMemberListDecorator, renderMessageAccessory, renderMessageDecoration, messagePopoverButton,
+        renderNicknameIcon
     } = p;
 
     if (p.stop) {
@@ -320,6 +324,7 @@ export const stopPlugin = traceFunction("stopPlugin", function stopPlugin(p: Plu
     if (renderMessageDecoration) removeMessageDecoration(name);
     if (renderMessageAccessory) removeMessageAccessory(name);
     if (messagePopoverButton) removeMessagePopoverButton(name);
+    if (renderNicknameIcon) removeNicknameIcon(name);
 
     return true;
 }, p => `stopPlugin ${p.name}`);
@@ -330,15 +335,12 @@ export const initPluginManager = onlyOnce(function init() {
 
     const pluginKeysToBind: Array<keyof PluginDef & `${"on" | "render"}${string}`> = [
         "onBeforeMessageEdit", "onBeforeMessageSend", "onMessageClick",
-        "renderMemberListDecorator", "renderMessageAccessory", "renderMessageDecoration"
+        "renderMemberListDecorator", "renderMessageAccessory", "renderMessageDecoration",
+        "renderNicknameIcon"
     ];
 
     const neededApiPlugins = new Set<string>();
 
-    // First round-trip to mark and force enable dependencies
-    //
-    // FIXME: might need to revisit this if there's ever nested (dependencies of dependencies) dependencies since this only
-    // goes for the top level and their children, but for now this works okay with the current API plugins
     for (const p of pluginsValues) if (isPluginEnabled(p.name)) {
         p.dependencies?.forEach(d => {
             const dep = Plugins[d];
@@ -366,6 +368,7 @@ export const initPluginManager = onlyOnce(function init() {
         if (p.renderMessageDecoration) neededApiPlugins.add("MessageDecorationsAPI");
         if (p.messagePopoverButton) neededApiPlugins.add("MessagePopoverAPI");
         if (p.userProfileBadge) neededApiPlugins.add("BadgeAPI");
+        if (p.renderNicknameIcon) neededApiPlugins.add("NicknameIconsAPI");
 
         for (const key of pluginKeysToBind) {
             p[key] &&= p[key].bind(p) as any;
@@ -379,11 +382,22 @@ export const initPluginManager = onlyOnce(function init() {
 
     for (const p of pluginsValues) {
         if (p.settings) {
-            p.settings.pluginName = p.name;
+            p.options ??= {};
 
-            for (const [key, def] of Object.entries(p.settings.def)) {
-                if (def.onChange)
-                    SettingsStore.addChangeListener(`plugins.${p.name}.${key}`, def.onChange);
+            p.settings.pluginName = p.name;
+            for (const name in p.settings.def) {
+                const def = p.settings.def[name];
+                const checks = p.settings.checks?.[name];
+                p.options[name] = { ...def, ...checks };
+            }
+        }
+
+        if (p.options) {
+            for (const name in p.options) {
+                const opt = p.options[name];
+                if (opt.onChange != null) {
+                    SettingsStore.addChangeListener(`plugins.${p.name}.${name}`, opt.onChange);
+                }
             }
         }
 
