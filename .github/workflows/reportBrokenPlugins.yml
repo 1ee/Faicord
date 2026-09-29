@@ -25,7 +25,7 @@ on:
 
 jobs:
     TestPlugins:
-        if: github.repository == 'Vendicated/Vencord'
+        if: github.repository == '1ee/Faicord'
         runs-on: ubuntu-latest
 
         steps:
